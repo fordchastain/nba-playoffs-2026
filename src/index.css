@@ -54,6 +54,12 @@ input {
   padding: 0 16px 40px;
 }
 
+@media (max-width: 480px) {
+  .app {
+    padding: 0 8px 32px;
+  }
+}
+
 .app-header {
   background: var(--color-surface);
   border-bottom: 2px solid var(--color-primary);
@@ -62,6 +68,13 @@ input {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 16px;
+    margin-bottom: 16px;
+  }
 }
 
 .app-header-inner {
@@ -78,6 +91,12 @@ input {
   font-weight: 700;
   color: var(--color-primary);
   letter-spacing: -0.5px;
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.2rem;
+  }
 }
 
 .app-section {
@@ -150,6 +169,12 @@ input {
   }
   .finals-column {
     order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .bracket-layout {
+    gap: 16px;
   }
 }
 
@@ -280,6 +305,29 @@ input {
   text-align: left;
   transition: background 0.1s;
   font-size: 0.875rem;
+  min-height: 44px; /* accessible touch target */
+}
+
+@media (max-width: 600px) {
+  .team-slot {
+    padding: 8px 6px;
+    gap: 4px;
+    font-size: 0.75rem;
+  }
+  .team-seed {
+    min-width: 12px;
+  }
+  .team-logo {
+    width: 16px;
+    height: 16px;
+  }
+  .matchup-label {
+    font-size: 0.6rem;
+    padding: 3px 6px;
+  }
+  .playoff-round-label {
+    font-size: 0.6rem;
+  }
 }
 
 .team-slot--pickable:hover {
@@ -336,7 +384,15 @@ input {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 16px;
+  position: relative;
 }
+
+@media (max-width: 600px) {
+  .playoff-bracket {
+    padding: 10px 8px;
+  }
+}
+
 
 .playoff-bracket-title {
   font-size: 0.9rem;
@@ -352,6 +408,8 @@ input {
   gap: 16px;
   overflow-x: auto;
   padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
 }
 
 .playoff-round {
@@ -359,6 +417,24 @@ input {
   flex-direction: column;
   gap: 8px;
   min-width: 180px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 600px) {
+  .playoff-rounds {
+    gap: 6px;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+  .playoff-round {
+    flex: 1;
+    min-width: 0;
+  }
+  .playoff-round--champion {
+    flex: 0 0 auto;
+    min-width: 0;
+    width: 60px;
+  }
 }
 
 .playoff-round-label {
@@ -423,6 +499,12 @@ input {
   padding-top: 80px;
 }
 
+@media (max-width: 1100px) {
+  .finals-column {
+    padding-top: 0;
+  }
+}
+
 .nba-finals {
   background: var(--color-surface);
   border: 2px solid var(--color-primary);
@@ -430,6 +512,13 @@ input {
   padding: 20px;
   width: 240px;
   text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .nba-finals {
+    width: 100%;
+    max-width: 360px;
+  }
 }
 
 .nba-finals-title {
