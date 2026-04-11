@@ -78,10 +78,10 @@ const R1_TO_R2: Record<
   number,
   { matchupIdx: number; slot: 'teamA' | 'teamB' }
 > = {
-  0: { matchupIdx: 0, slot: 'teamA' },
-  1: { matchupIdx: 1, slot: 'teamA' },
-  2: { matchupIdx: 1, slot: 'teamB' },
-  3: { matchupIdx: 0, slot: 'teamB' },
+  0: { matchupIdx: 0, slot: 'teamA' }, // 1v8 winner → R2 matchup 0
+  1: { matchupIdx: 0, slot: 'teamB' }, // 4v5 winner → R2 matchup 0
+  2: { matchupIdx: 1, slot: 'teamA' }, // 2v7 winner → R2 matchup 1
+  3: { matchupIdx: 1, slot: 'teamB' }, // 3v6 winner → R2 matchup 1
 };
 
 export function pickPlayoffWinner(
@@ -143,12 +143,12 @@ export function syncPlayInToPlayoff(
   const seed8 = getPlayInSeed8(conf.playIn);
 
   const r1 = conf.rounds[0].map(cloneMatchup);
-  r1[0] = setTeamInMatchup(r1[0], 'teamB', seed8);
-  r1[1] = setTeamInMatchup(r1[1], 'teamB', seed7);
+  r1[0] = setTeamInMatchup(r1[0], 'teamB', seed8); // 1v8
+  r1[2] = setTeamInMatchup(r1[2], 'teamB', seed7); // 2v7
 
   const rounds = [r1, ...conf.rounds.slice(1)] as ConferenceBracket['rounds'];
 
-  ([0, 1] as const).forEach((i) => {
+  ([0, 2] as const).forEach((i) => {
     if (!rounds[0][i].winner) {
       const { matchupIdx, slot } = R1_TO_R2[i];
       rounds[1][matchupIdx] = setTeamInMatchup(

@@ -28,9 +28,9 @@ function buildConference(teams: Team[]): ConferenceBracket {
   const rounds: ConferenceBracket['rounds'] = [
     [
       { teamA: s(1), teamB: null, winner: null },
+      { teamA: s(4), teamB: s(5), winner: null },
       { teamA: s(2), teamB: null, winner: null },
       { teamA: s(3), teamB: s(6), winner: null },
-      { teamA: s(4), teamB: s(5), winner: null },
     ],
     [emptyMatchup(), emptyMatchup()],
     [emptyMatchup()],

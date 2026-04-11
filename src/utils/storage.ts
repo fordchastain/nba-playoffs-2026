@@ -1,6 +1,6 @@
 import type { BracketState } from '../types/bracket';
 
-const STORAGE_KEY = 'nba-playoffs-2026-bracket';
+const STORAGE_KEY = 'nba-playoffs-2026-bracket-v2';
 
 export function saveBracket(state: BracketState): void {
   try {

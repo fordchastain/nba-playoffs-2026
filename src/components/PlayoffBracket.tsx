@@ -12,9 +12,9 @@ const ROUND_LABELS = ['First Round', 'Second Round', 'Conf Finals'];
 const MATCHUP_LABELS: Record<number, Record<number, string>> = {
   0: {
     0: '1 vs 8',
-    1: '2 vs 7',
-    2: '3 vs 6',
-    3: '4 vs 5',
+    1: '4 vs 5',
+    2: '2 vs 7',
+    3: '3 vs 6',
   },
   1: {
     0: 'W(1/8) vs W(4/5)',
