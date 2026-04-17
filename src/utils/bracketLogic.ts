@@ -3,9 +3,8 @@ import type {
   ConferenceBracket,
   Conference,
   Matchup,
-  PlayInState,
   Team,
-} from '../types/bracket';
+} from "../types/bracket";
 
 const cloneMatchup = (m: Matchup): Matchup => ({
   teamA: m.teamA,
@@ -15,8 +14,8 @@ const cloneMatchup = (m: Matchup): Matchup => ({
 
 function setTeamInMatchup(
   m: Matchup,
-  slot: 'teamA' | 'teamB',
-  team: Team | null
+  slot: "teamA" | "teamB",
+  team: Team | null,
 ): Matchup {
   const updated = { ...m, [slot]: team };
   if (
@@ -29,70 +28,25 @@ function setTeamInMatchup(
   return updated;
 }
 
-export function pickPlayInWinner(
-  playIn: PlayInState,
-  game: 'game1' | 'game2',
-  winner: Team
-): PlayInState {
-  const updated = { ...playIn, [game]: { ...playIn[game], winner } };
-
-  const g1Loser = updated.game1.winner
-    ? updated.game1.winner.id === updated.game1.teamA?.id
-      ? updated.game1.teamB
-      : updated.game1.teamA
-    : null;
-
-  const g2Winner = updated.game2.winner;
-
-  let game3Winner = updated.game3.winner;
-  if (
-    game3Winner &&
-    game3Winner.id !== g1Loser?.id &&
-    game3Winner.id !== g2Winner?.id
-  ) {
-    game3Winner = null;
-  }
-
-  return {
-    ...updated,
-    game3: { teamA: g1Loser, teamB: g2Winner, winner: game3Winner },
-  };
-}
-
-export function pickPlayInGame3Winner(
-  playIn: PlayInState,
-  winner: Team
-): PlayInState {
-  return { ...playIn, game3: { ...playIn.game3, winner } };
-}
-
-export function getPlayInSeed7(playIn: PlayInState): Team | null {
-  return playIn.game1.winner ?? null;
-}
-
-export function getPlayInSeed8(playIn: PlayInState): Team | null {
-  return playIn.game3.winner ?? null;
-}
-
 const R1_TO_R2: Record<
   number,
-  { matchupIdx: number; slot: 'teamA' | 'teamB' }
+  { matchupIdx: number; slot: "teamA" | "teamB" }
 > = {
-  0: { matchupIdx: 0, slot: 'teamA' }, // 1v8 winner → R2 matchup 0
-  1: { matchupIdx: 0, slot: 'teamB' }, // 4v5 winner → R2 matchup 0
-  2: { matchupIdx: 1, slot: 'teamA' }, // 2v7 winner → R2 matchup 1
-  3: { matchupIdx: 1, slot: 'teamB' }, // 3v6 winner → R2 matchup 1
+  0: { matchupIdx: 0, slot: "teamA" }, // 1v8 winner → R2 matchup 0
+  1: { matchupIdx: 0, slot: "teamB" }, // 4v5 winner → R2 matchup 0
+  2: { matchupIdx: 1, slot: "teamA" }, // 2v7 winner → R2 matchup 1
+  3: { matchupIdx: 1, slot: "teamB" }, // 3v6 winner → R2 matchup 1
 };
 
 export function pickPlayoffWinner(
   conf: ConferenceBracket,
   roundIdx: number,
   matchupIdx: number,
-  winner: Team
+  winner: Team,
 ): ConferenceBracket {
   const rounds = conf.rounds.map((round) =>
-    round.map(cloneMatchup)
-  ) as ConferenceBracket['rounds'];
+    round.map(cloneMatchup),
+  ) as ConferenceBracket["rounds"];
 
   rounds[roundIdx][matchupIdx] = { ...rounds[roundIdx][matchupIdx], winner };
 
@@ -101,14 +55,14 @@ export function pickPlayoffWinner(
     rounds[1][nextIdx] = setTeamInMatchup(rounds[1][nextIdx], slot, winner);
 
     const r2Winner = rounds[1][nextIdx].winner;
-    const cfSlot: 'teamA' | 'teamB' = nextIdx === 0 ? 'teamA' : 'teamB';
+    const cfSlot: "teamA" | "teamB" = nextIdx === 0 ? "teamA" : "teamB";
     if (!r2Winner) {
       rounds[2][0] = setTeamInMatchup(rounds[2][0], cfSlot, null);
     } else {
       rounds[2][0] = setTeamInMatchup(rounds[2][0], cfSlot, r2Winner);
     }
   } else if (roundIdx === 1) {
-    const cfSlot: 'teamA' | 'teamB' = matchupIdx === 0 ? 'teamA' : 'teamB';
+    const cfSlot: "teamA" | "teamB" = matchupIdx === 0 ? "teamA" : "teamB";
     rounds[2][0] = setTeamInMatchup(rounds[2][0], cfSlot, winner);
   }
 
@@ -136,78 +90,19 @@ export function syncFinals(state: BracketState): BracketState {
   return { ...state, finals };
 }
 
-export function syncPlayInToPlayoff(
-  conf: ConferenceBracket
-): ConferenceBracket {
-  const seed7 = getPlayInSeed7(conf.playIn);
-  const seed8 = getPlayInSeed8(conf.playIn);
-
-  const r1 = conf.rounds[0].map(cloneMatchup);
-  r1[0] = setTeamInMatchup(r1[0], 'teamB', seed8); // 1v8
-  r1[2] = setTeamInMatchup(r1[2], 'teamB', seed7); // 2v7
-
-  const rounds = [r1, ...conf.rounds.slice(1)] as ConferenceBracket['rounds'];
-
-  ([0, 2] as const).forEach((i) => {
-    if (!rounds[0][i].winner) {
-      const { matchupIdx, slot } = R1_TO_R2[i];
-      rounds[1][matchupIdx] = setTeamInMatchup(
-        rounds[1][matchupIdx],
-        slot,
-        null
-      );
-      if (!rounds[1][matchupIdx].winner) {
-        const cfSlot: 'teamA' | 'teamB' = matchupIdx === 0 ? 'teamA' : 'teamB';
-        rounds[2][0] = setTeamInMatchup(rounds[2][0], cfSlot, null);
-      }
-    }
-  });
-
-  return { ...conf, rounds };
-}
-
-export function updatePlayIn(
-  state: BracketState,
-  conf: Conference,
-  game: 'game1' | 'game2',
-  winner: Team
-): BracketState {
-  const key = conf === 'east' ? 'east' : 'west';
-  const updatedConf = {
-    ...state[key],
-    playIn: pickPlayInWinner(state[key].playIn, game, winner),
-  };
-  const synced = syncPlayInToPlayoff(updatedConf);
-  return syncFinals({ ...state, [key]: synced });
-}
-
-export function updatePlayInGame3(
-  state: BracketState,
-  conf: Conference,
-  winner: Team
-): BracketState {
-  const key = conf === 'east' ? 'east' : 'west';
-  const updatedConf = {
-    ...state[key],
-    playIn: pickPlayInGame3Winner(state[key].playIn, winner),
-  };
-  const synced = syncPlayInToPlayoff(updatedConf);
-  return syncFinals({ ...state, [key]: synced });
-}
-
 export function updatePlayoff(
   state: BracketState,
   conf: Conference,
   roundIdx: number,
   matchupIdx: number,
-  winner: Team
+  winner: Team,
 ): BracketState {
-  const key = conf === 'east' ? 'east' : 'west';
+  const key = conf === "east" ? "east" : "west";
   const updatedConf = pickPlayoffWinner(
     state[key],
     roundIdx,
     matchupIdx,
-    winner
+    winner,
   );
   return syncFinals({ ...state, [key]: updatedConf });
 }

@@ -14,17 +14,10 @@ export interface Matchup {
   winner: Team | null;
 }
 
-export interface PlayInState {
-  game1: Matchup;
-  game2: Matchup;
-  game3: Matchup;
-}
-
 export type PlayoffRounds = [Matchup[], Matchup[], Matchup[]];
 
 export interface ConferenceBracket {
   conference: Conference;
-  playIn: PlayInState;
   rounds: PlayoffRounds;
 }
 
