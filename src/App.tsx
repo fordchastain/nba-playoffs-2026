@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import ExportShare from './components/ExportShare';
-import NBAFinals from './components/NBAFinals';
-import PlayInBracket from './components/PlayInBracket';
-import PlayoffBracket from './components/PlayoffBracket';
+import ExportShare from "./components/ExportShare";
+import NBAFinals from "./components/NBAFinals";
+import PlayoffBracket from "./components/PlayoffBracket";
 
-import { buildInitialState } from './data/initialState';
-import type { BracketState, Team } from './types/bracket';
-import {
-  updateFinals,
-  updatePlayIn,
-  updatePlayInGame3,
-  updatePlayoff,
-} from './utils/bracketLogic';
-import { clearBracket, loadBracket, saveBracket } from './utils/storage';
+import { buildInitialState } from "./data/initialState";
+import type { BracketState, Team } from "./types/bracket";
+import { updateFinals, updatePlayoff } from "./utils/bracketLogic";
+import { clearBracket, loadBracket, saveBracket } from "./utils/storage";
 
 function App() {
   const [state, setState] = useState<BracketState>(() => {
@@ -24,23 +18,11 @@ function App() {
     saveBracket(state);
   }, [state]);
 
-  function handlePlayInPick(
-    conf: 'east' | 'west',
-    game: 'game1' | 'game2',
-    winner: Team
-  ) {
-    setState((s) => updatePlayIn(s, conf, game, winner));
-  }
-
-  function handlePlayInGame3Pick(conf: 'east' | 'west', winner: Team) {
-    setState((s) => updatePlayInGame3(s, conf, winner));
-  }
-
   function handlePlayoffPick(
-    conf: 'east' | 'west',
+    conf: "east" | "west",
     roundIdx: number,
     matchupIdx: number,
-    winner: Team
+    winner: Team,
   ) {
     setState((s) => updatePlayoff(s, conf, roundIdx, matchupIdx, winner));
   }
@@ -50,7 +32,7 @@ function App() {
   }
 
   function handleReset() {
-    const confirmed = window.confirm('Reset all bracket picks?');
+    const confirmed = window.confirm("Reset all bracket picks?");
     if (!confirmed) return;
     clearBracket();
     setState(buildInitialState());
@@ -71,18 +53,10 @@ function App() {
         <div className="conference-section conference-section--east">
           <h2 className="conference-heading">Eastern Conference</h2>
 
-          <PlayInBracket
-            conference="east"
-            playIn={state.east.playIn}
-            onGame1Pick={(w) => handlePlayInPick('east', 'game1', w)}
-            onGame2Pick={(w) => handlePlayInPick('east', 'game2', w)}
-            onGame3Pick={(w) => handlePlayInGame3Pick('east', w)}
-          />
-
           <PlayoffBracket
             conference="east"
             bracket={state.east}
-            onPick={(ri, mi, w) => handlePlayoffPick('east', ri, mi, w)}
+            onPick={(ri, mi, w) => handlePlayoffPick("east", ri, mi, w)}
           />
         </div>
 
@@ -93,18 +67,10 @@ function App() {
         <div className="conference-section conference-section--west">
           <h2 className="conference-heading">Western Conference</h2>
 
-          <PlayInBracket
-            conference="west"
-            playIn={state.west.playIn}
-            onGame1Pick={(w) => handlePlayInPick('west', 'game1', w)}
-            onGame2Pick={(w) => handlePlayInPick('west', 'game2', w)}
-            onGame3Pick={(w) => handlePlayInGame3Pick('west', w)}
-          />
-
           <PlayoffBracket
             conference="west"
             bracket={state.west}
-            onPick={(ri, mi, w) => handlePlayoffPick('west', ri, mi, w)}
+            onPick={(ri, mi, w) => handlePlayoffPick("west", ri, mi, w)}
           />
         </div>
       </main>
